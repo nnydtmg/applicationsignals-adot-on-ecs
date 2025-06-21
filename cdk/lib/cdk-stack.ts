@@ -66,34 +66,123 @@ export class CdkStack extends cdk.Stack {
       dest: new ecrdeploy.DockerImageName(adotRepository.repositoryUriForTag(process.env.ADOT_TAG || 'latest')),
     })
 
-    // ALBを使用したFargateサービスの作成
+    // タスク実行ロールの作成と権限設定
+    const executionRole = new cdk.aws_iam.Role(this, 'TaskExecutionRole', {
+      assumedBy: new cdk.aws_iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+      managedPolicies: [
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonPrometheusRemoteWriteAccess'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'),
+      ]
+    });
+    
+    // タスクロールの作成と権限設定
+    const taskRole = new cdk.aws_iam.Role(this, 'TaskRole', {
+      assumedBy: new cdk.aws_iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+      managedPolicies: [
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonECSTaskExecutionRolePolicy'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonPrometheusRemoteWriteAccess'),
+      ]
+    });
+    
+    // Application SignalsへのアクセスポリシーをIAMロールに追加
+    const applicationSignalsPolicy = new cdk.aws_iam.PolicyStatement({
+      effect: cdk.aws_iam.Effect.ALLOW,
+      actions: [
+        'application-signals:Ingest*',
+        'cloudwatch:PutMetricData',
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents',
+        'logs:DescribeLogStreams',
+        'xray:PutTraceSegments',
+        'xray:PutTelemetryRecords',
+        'xray:GetSamplingRules',
+        'xray:GetSamplingTargets',
+        'xray:GetSamplingStatisticSummaries'
+      ],
+      resources: ['*'],
+    });
+    
+    taskRole.addToPrincipalPolicy(applicationSignalsPolicy);
+    executionRole.addToPrincipalPolicy(applicationSignalsPolicy);
+    
+    // タスク定義の作成
+    const taskDefinition = new ecs.FargateTaskDefinition(this, 'TaskDef', {
+      memoryLimitMiB: 1024,
+      cpu: 512,
+      executionRole: executionRole,
+      taskRole: taskRole,
+    });
+
+    // メインアプリケーションコンテナ
+    const appContainer = taskDefinition.addContainer('app', {
+      image: ecs.ContainerImage.fromRegistry(appRepository.repositoryUriForTag(process.env.APP_TAG || 'latest')),
+      logging: ecs.LogDrivers.awsLogs({
+        logGroup: logGroup,
+        streamPrefix: 'ecs-app',
+      }),
+      environment: {
+        OTEL_TRACES_EXPORTER: 'otlp',
+        OTEL_LOGS_EXPORTER: 'otlp',
+        OTEL_METRICS_EXPORTER: 'otlp',
+        OTEL_PROPAGATORS: 'xray,tracecontext,baggage,b3',
+        OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server,aws.log.group.names=dice-server',
+        OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
+        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://cw-agent:4316/v1/traces',
+        OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://adot:4318/v1/logs',
+        OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT: 'http://cw-agent:4316/v1/metrics',
+        OTEL_AWS_APPLICATION_SIGNALS_ENABLED: 'true',
+        OTEL_TRACES_SAMPLER: 'always_on',
+        JAVA_TOOL_OPTIONS: '-javaagent:/app/aws-opentelemetry-agent.jar'
+      },
+      essential: true,
+    });
+
+    appContainer.addPortMappings({
+      containerPort: 8080,
+      hostPort: 8080,
+      protocol: ecs.Protocol.TCP
+    });
+
+    // ADOTサイドカーコンテナ
+    const adotContainer = taskDefinition.addContainer('adot', {
+      image: ecs.ContainerImage.fromRegistry(adotRepository.repositoryUriForTag(process.env.ADOT_TAG || 'latest')),
+      logging: ecs.LogDrivers.awsLogs({
+        logGroup: logGroup,
+        streamPrefix: 'ecs-adot',
+      }),
+      essential: true,
+    });
+
+    // CloudWatch Agentサイドカーコンテナ
+    const cwAgentContainer = taskDefinition.addContainer('cw-agent', {
+      image: ecs.ContainerImage.fromRegistry('public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest'),
+      logging: ecs.LogDrivers.awsLogs({
+        logGroup: logGroup,
+        streamPrefix: 'ecs-cw-agent',
+      }),
+      essential: true,
+      environment: {
+        CW_CONFIG_CONTENT: JSON.stringify({
+          logs: {
+            metrics_collected: {
+              application_signals: {}
+            }
+          }
+        }),
+        OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server'
+      }
+    });
+
+    // ALBを使用したFargateサービスの作成 (カスタムタスク定義を使用)
     const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
       cluster: cluster,
-      memoryLimitMiB: 512,
-      cpu: 256,
+      taskDefinition: taskDefinition,
       desiredCount: 1,
-      taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry(appRepository.repositoryUriForTag(process.env.APP_TAG || 'latest')),
-        containerPort: 8080,
-        environment: {
-          OTEL_TRACES_EXPORTER: 'otlp',
-          OTEL_LOGS_EXPORTER: 'otlp',
-          OTEL_METRICS_EXPORTER: 'otlp',
-          OTEL_PROPAGATORS: 'xray,tracecontext,baggage,b3',
-          OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server,aws.log.group.names=dice-server',
-          OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
-          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://cw-agent:4316/v1/traces',
-          OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://adot:4318/v1/logs',
-          OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT: 'http://cw-agent:4316/v1/metrics',
-          OTEL_AWS_APPLICATION_SIGNALS_ENABLED: 'true',
-          OTEL_TRACES_SAMPLER: 'always_on',
-          JAVA_TOOL_OPTIONS: '-javaagent:/app/aws-opentelemetry-agent.jar'
-        },
-        logDriver: ecs.LogDrivers.awsLogs({
-          logGroup: logGroup,
-          streamPrefix: 'ecs-service',
-        }),
-      },
       assignPublicIp: false,
       publicLoadBalancer: true,
     });
