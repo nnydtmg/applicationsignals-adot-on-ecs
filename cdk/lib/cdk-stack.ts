@@ -112,8 +112,8 @@ export class CdkStack extends cdk.Stack {
     
     // タスク定義の作成
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'TaskDef', {
-      memoryLimitMiB: 1024,
-      cpu: 512,
+      memoryLimitMiB: 2048,
+      cpu: 1024,
       executionRole: executionRole,
       taskRole: taskRole,
       runtimePlatform: {
@@ -136,9 +136,9 @@ export class CdkStack extends cdk.Stack {
         OTEL_PROPAGATORS: 'xray,tracecontext,baggage,b3',
         OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server,aws.log.group.names=dice-server',
         OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://localhost:4318/v1/traces',
-        OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://localhost:4317/v1/logs',
-        OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT: 'http://localhost:4318/v1/metrics',
+        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://127.0.0.1:4316/v1/traces',
+        // OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://127.0.0.1:4317/v1/logs',
+        OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT: 'http://127.0.0.1:4316/v1/metrics',
         OTEL_AWS_APPLICATION_SIGNALS_ENABLED: 'true',
         OTEL_TRACES_SAMPLER: 'always_on',
         JAVA_TOOL_OPTIONS: '-javaagent:/app/aws-opentelemetry-agent.jar'
@@ -155,11 +155,6 @@ export class CdkStack extends cdk.Stack {
     // ADOTサイドカーコンテナ
     const adotContainer = taskDefinition.addContainer('adot', {
       image: ecs.ContainerImage.fromRegistry(adotRepository.repositoryUriForTag(process.env.ADOT_TAG || 'latest')),
-      portMappings: [{
-        containerPort: 4317,
-        hostPort: 4317,
-        protocol: ecs.Protocol.TCP,
-      }],
       logging: ecs.LogDrivers.awsLogs({
         logGroup: logGroup,
         streamPrefix: 'ecs-adot',
@@ -170,11 +165,6 @@ export class CdkStack extends cdk.Stack {
     // CloudWatch Agentサイドカーコンテナ
     const cwAgentContainer = taskDefinition.addContainer('cw-agent', {
       image: ecs.ContainerImage.fromRegistry('public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest-arm64'),
-      portMappings: [{
-        containerPort: 4318,
-        hostPort: 4318,
-        protocol: ecs.Protocol.TCP,
-      }],
       logging: ecs.LogDrivers.awsLogs({
         logGroup: logGroup,
         streamPrefix: 'ecs-cw-agent',
@@ -196,6 +186,14 @@ export class CdkStack extends cdk.Stack {
         OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server'
       }
     });
+    appContainer.addContainerDependencies({
+      container: cwAgentContainer,
+      condition: ecs.ContainerDependencyCondition.START
+    });
+    appContainer.addContainerDependencies({
+      container: adotContainer,
+      condition: ecs.ContainerDependencyCondition.START
+    });
 
     // ALBを使用したFargateサービスの作成 (カスタムタスク定義を使用)
     const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
@@ -208,12 +206,13 @@ export class CdkStack extends cdk.Stack {
 
     // ALBのヘルスチェック設定
     fargateService.targetGroup.configureHealthCheck({
-      path: '/dice',
+      path: '/rolldice',
       healthyHttpCodes: '200',
       interval: cdk.Duration.seconds(30),
       timeout: cdk.Duration.seconds(5),
       healthyThresholdCount: 2,
-      unhealthyThresholdCount: 2,
+      unhealthyThresholdCount: 4,
+      port: '8080',
     });
 
     // 自動スケーリング設定
