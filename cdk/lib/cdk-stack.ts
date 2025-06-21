@@ -198,7 +198,7 @@ export class CdkStack extends cdk.Stack {
 
     // ALBのヘルスチェック設定
     fargateService.targetGroup.configureHealthCheck({
-      path: './dice',
+      path: '/dice',
       healthyHttpCodes: '200',
       interval: cdk.Duration.seconds(30),
       timeout: cdk.Duration.seconds(5),
