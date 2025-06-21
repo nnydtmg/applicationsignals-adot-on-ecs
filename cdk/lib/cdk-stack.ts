@@ -168,6 +168,11 @@ export class CdkStack extends cdk.Stack {
       essential: true,
       environment: {
         CW_CONFIG_CONTENT: JSON.stringify({
+          traces: {
+            traces_collected: {
+              application_signals: {}
+            }
+          },
           logs: {
             metrics_collected: {
               application_signals: {}
