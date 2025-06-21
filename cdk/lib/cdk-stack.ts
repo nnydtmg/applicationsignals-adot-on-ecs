@@ -116,6 +116,10 @@ export class CdkStack extends cdk.Stack {
       cpu: 512,
       executionRole: executionRole,
       taskRole: taskRole,
+      runtimePlatform: {
+        operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
+        cpuArchitecture: ecs.CpuArchitecture.ARM64,
+      },
     });
 
     // メインアプリケーションコンテナ
@@ -160,7 +164,7 @@ export class CdkStack extends cdk.Stack {
 
     // CloudWatch Agentサイドカーコンテナ
     const cwAgentContainer = taskDefinition.addContainer('cw-agent', {
-      image: ecs.ContainerImage.fromRegistry('public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest'),
+      image: ecs.ContainerImage.fromRegistry('public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest-arm64'),
       logging: ecs.LogDrivers.awsLogs({
         logGroup: logGroup,
         streamPrefix: 'ecs-cw-agent',

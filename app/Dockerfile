@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/gradle:jdk17 AS builder
+FROM --platform=arm64 public.ecr.aws/docker/library/gradle:jdk17 AS builder
 
 WORKDIR /app
 COPY *.java .
@@ -7,7 +7,7 @@ COPY build.gradle.kts .
 
 RUN ["gradle", "assemble"]
 
-FROM gcr.io/distroless/java17-debian11:latest
+FROM --platform=arm64 gcr.io/distroless/java17-debian11:latest
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/ ./build/libs/
