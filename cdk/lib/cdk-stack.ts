@@ -209,7 +209,7 @@ export class CdkStack extends cdk.Stack {
       path: '/rolldice',
       healthyHttpCodes: '200',
       interval: cdk.Duration.seconds(30),
-      timeout: cdk.Duration.seconds(5),
+      timeout: cdk.Duration.seconds(15),
       healthyThresholdCount: 2,
       unhealthyThresholdCount: 4,
       port: '8080',
