@@ -34,4 +34,8 @@ public class RollController {
     }
     return result;
   }
+  @GetMapping("/healthcheck")
+  public String health() {
+    return "OK";
+  }
 }
