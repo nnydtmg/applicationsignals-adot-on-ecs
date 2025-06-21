@@ -42,7 +42,7 @@ export class CdkStack extends cdk.Stack {
       cluster: cluster,
       memoryLimitMiB: 512,
       cpu: 256,
-      desiredCount: 2,
+      desiredCount: 1,
       taskImageOptions: {
         image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: 80,
@@ -68,7 +68,7 @@ export class CdkStack extends cdk.Stack {
     // 自動スケーリング設定
     const scaling = fargateService.service.autoScaleTaskCount({
       maxCapacity: 4,
-      minCapacity: 2,
+      minCapacity: 1,
     });
 
     // CPU使用率に基づいたスケーリング
