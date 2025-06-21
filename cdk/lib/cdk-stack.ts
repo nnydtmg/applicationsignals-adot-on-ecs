@@ -81,7 +81,7 @@ export class CdkStack extends cdk.Stack {
     const taskRole = new cdk.aws_iam.Role(this, 'TaskRole', {
       assumedBy: new cdk.aws_iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
       managedPolicies: [
-        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonECSTaskExecutionRolePolicy'),
+        cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy'),
         cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
         cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'),
         cdk.aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonPrometheusRemoteWriteAccess'),
