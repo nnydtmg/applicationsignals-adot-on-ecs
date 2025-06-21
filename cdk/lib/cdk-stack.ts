@@ -174,12 +174,12 @@ export class CdkStack extends cdk.Stack {
         CW_CONFIG_CONTENT: JSON.stringify({
           traces: {
             traces_collected: {
-              application_signals: {}
+              application_signals: {"enabled": true}
             }
           },
           logs: {
             metrics_collected: {
-              application_signals: {}
+              application_signals: {"enabled": true}
             }
           }
         }),
