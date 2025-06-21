@@ -16,6 +16,6 @@ repositories {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation("software.amazon.opentelemetry:aws-opentelemetry-agent:1.31.0")
+  implementation("software.amazon.opentelemetry:aws-opentelemetry-agent:2.11.0")
   runtimeOnly("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.6.0-alpha")
 }

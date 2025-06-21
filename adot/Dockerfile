@@ -1,4 +1,4 @@
-FROM --platform=arm64 public.ecr.aws/aws-observability/aws-otel-collector:v0.40.0
+FROM --platform=arm64 public.ecr.aws/aws-observability/aws-otel-collector:latest
 COPY ./otel-config.yaml /etc/otel-config.yaml
 
 EXPOSE 4317 4318
