@@ -137,7 +137,7 @@ export class CdkStack extends cdk.Stack {
         OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server,aws.log.group.names=dice-server',
         OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
         OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://127.0.0.1:4316/v1/traces',
-        // OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://127.0.0.1:4317/v1/logs',
+        // OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: 'http://127.0.0.1:4318/v1/logs',
         OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT: 'http://127.0.0.1:4316/v1/metrics',
         OTEL_AWS_APPLICATION_SIGNALS_ENABLED: 'true',
         OTEL_TRACES_SAMPLER: 'always_on',
