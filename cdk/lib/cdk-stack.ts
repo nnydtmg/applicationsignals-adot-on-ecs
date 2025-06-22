@@ -6,8 +6,10 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
-import * as ecrdeploy from 'cdk-ecr-deployment'
-import path = require('path')
+import * as ecrdeploy from 'cdk-ecr-deployment';
+import * as synthetics from 'aws-cdk-lib/aws-synthetics';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import path = require('path');
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -230,6 +232,72 @@ export class CdkStack extends cdk.Stack {
 
     // アウトプットの定義
     new cdk.CfnOutput(this, 'LoadBalancerDNS', { value: fargateService.loadBalancer.loadBalancerDnsName });
-    new cdk.CfnOutput(this, 'ServiceURL', { value: `http://${fargateService.loadBalancer.loadBalancerDnsName}` });
+    const serviceUrl = `http://${fargateService.loadBalancer.loadBalancerDnsName}`;
+    new cdk.CfnOutput(this, 'ServiceURL', { value: serviceUrl });
+
+    // Canary用のIAMロールを作成
+    const canaryRole = new iam.Role(this, 'CanaryRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchSyntheticsFullAccess'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonPrometheusRemoteWriteAccess')
+      ]
+    });
+
+    // Application Signals関連の権限を追加
+    const applicationSignalsCanaryPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'application-signals:Ingest*',
+        'cloudwatch:PutMetricData',
+        'synthetics:*',
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents',
+        'logs:DescribeLogStreams',
+        'xray:PutTraceSegments',
+        'xray:PutTelemetryRecords',
+        'xray:GetSamplingRules',
+        'xray:GetSamplingTargets',
+        'xray:GetSamplingStatisticSummaries'
+      ],
+      resources: ['*']
+    });
+
+    canaryRole.addToPolicy(applicationSignalsCanaryPolicy);
+
+    // CloudWatch Synthetics Canaryの作成
+    const canary = new synthetics.Canary(this, 'AppSignalsCanary', {
+      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      test: synthetics.Test.custom({
+        code: synthetics.Code.fromAsset(path.join(__dirname, 'assets/canary')),
+        handler: 'app.handler',
+      }),
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_9,
+      role: canaryRole,
+      environmentVariables: {
+        URL: serviceUrl,
+        SERVICE_NAME: 'dice-server-canary',
+        OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server-canary',
+        APPLICATION_SIGNALS_INTEGRATION: 'true'
+      },
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [
+        new ec2.SecurityGroup(this, 'CanarySecurityGroup', {
+          vpc,
+          description: 'Security group for Synthetics Canary',
+          allowAllOutbound: true
+        })
+      ],
+      startAfterCreation: true,
+      artifactsBucketLocation: {
+        retention: cdk.aws_s3.RetentionDays.ONE_WEEK,
+      }
+    });
+
+    // Application Signals統合用の設定
+    canary.node.addDependency(fargateService);
   }
 }
