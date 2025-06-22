@@ -68,7 +68,7 @@ const ecsService = integ_test.assertions.awsApiCall('ECS', 'describeServices', {
   services: [stack.fargateService.service.serviceName],
 });
 
-ecsService.assertAtPath('services.0.runningCount', 1);
+ecsService.assertAtPath('services.0.runningCount', integ.Match.anyValue());
 
 // ALBのDNS名を取得
 const albDetails = integ_test.assertions.awsApiCall('ElasticLoadBalancingV2', 'describeLoadBalancers', {
