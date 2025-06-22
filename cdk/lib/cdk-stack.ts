@@ -259,7 +259,9 @@ export class CdkStack extends cdk.Stack {
         'xray:PutTelemetryRecords',
         'xray:GetSamplingRules',
         'xray:GetSamplingTargets',
-        'xray:GetSamplingStatisticSummaries'
+        'xray:GetSamplingStatisticSummaries',
+        's3:PutObject',
+        's3:ListBucket',
       ],
       resources: ['*']
     });
@@ -270,21 +272,18 @@ export class CdkStack extends cdk.Stack {
     const canary = new synthetics.Canary(this, 'AppSignalsCanary', {
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       test: synthetics.Test.custom({
-        code: synthetics.Code.fromAsset(path.join(__dirname, "./assets/canary")),
+        code: synthetics.Code.fromAsset(path.join(__dirname, "assets/canary")),
         handler: "nodejs/node_modules/index.handler",
       }),
-      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_9,
+      memory: cdk.Size.gibibytes(1),
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_9_1,
       role: canaryRole,
       environmentVariables: {
-        URL: `http://${fargateService.loadBalancer.loadBalancerDnsName}`,
-        SERVICE_NAME: 'dice-server-canary',
-        OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server-canary',
-        APPLICATION_SIGNALS_INTEGRATION: 'true'
+        URL: `http://${fargateService.loadBalancer.loadBalancerDnsName}/rolldice?rolls=12`,
+        SERVICE_NAME: 'dice-server',
       },
       startAfterCreation: true,
-      artifactsBucketLocation: {
-        retention: cdk.aws_s3.RetentionDays.ONE_WEEK,
-      }
+      activeTracing: true
     });
 
     // Application Signals統合用の設定
