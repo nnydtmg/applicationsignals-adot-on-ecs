@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  pull_request:
+    branches: '*'
   push:
     branches: [ main ]
     paths:
@@ -60,6 +62,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: cdk-synth
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+            platforms: linux/arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t app:ci ./app
@@ -71,6 +79,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: cdk-synth
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+            platforms: linux/arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t adot:ci ./adot
