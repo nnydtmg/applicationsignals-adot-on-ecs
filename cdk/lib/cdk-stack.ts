@@ -283,7 +283,7 @@ export class CdkStack extends cdk.Stack {
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       test: synthetics.Test.custom({
         code: synthetics.Code.fromAsset(path.join(__dirname, "assets/canary")),
-        handler: "nodejs/node_modules/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules/index.handler",
+        handler: "index.handler",
       }),
       memory: cdk.Size.gibibytes(1),
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_9_1,
