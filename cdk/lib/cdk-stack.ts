@@ -14,11 +14,18 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export class CdkStack extends cdk.Stack {
+  // 統合テストで使用するためにパブリックプロパティを追加
+  public readonly vpc: ec2.Vpc;
+  public readonly cluster: ecs.Cluster;
+  public readonly fargateService: ecs_patterns.ApplicationLoadBalancedFargateService;
+  public readonly loadBalancer: cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer;
+  public readonly canary: synthetics.Canary;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // VPCの作成
-    const vpc = new ec2.Vpc(this, 'MyVpc', {
+    this.vpc = new ec2.Vpc(this, 'MyVpc', {
       maxAzs: 2, // Default is all AZs in the region
       natGateways: 1, // Number of NAT gateways
       subnetConfiguration: [
@@ -34,8 +41,8 @@ export class CdkStack extends cdk.Stack {
     });
 
     // ECSクラスターの作成
-    const cluster = new ecs.Cluster(this, 'MyCluster', {
-      vpc: vpc,
+    this.cluster = new ecs.Cluster(this, 'MyCluster', {
+      vpc: this.vpc,
       containerInsights: true,
     });
 
@@ -198,16 +205,19 @@ export class CdkStack extends cdk.Stack {
     });
 
     // ALBを使用したFargateサービスの作成 (カスタムタスク定義を使用)
-    const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
-      cluster: cluster,
+    this.fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MyFargateService', {
+      cluster: this.cluster,
       taskDefinition: taskDefinition,
       desiredCount: 1,
       assignPublicIp: false,
       publicLoadBalancer: true,
     });
 
+    // LoadBalancerの参照を保存
+    this.loadBalancer = this.fargateService.loadBalancer;
+
     // ALBのヘルスチェック設定
-    fargateService.targetGroup.configureHealthCheck({
+    this.fargateService.targetGroup.configureHealthCheck({
       path: '/healthcheck',
       healthyHttpCodes: '200',
       interval: cdk.Duration.seconds(30),
@@ -218,7 +228,7 @@ export class CdkStack extends cdk.Stack {
     });
 
     // 自動スケーリング設定
-    const scaling = fargateService.service.autoScaleTaskCount({
+    const scaling = this.fargateService.service.autoScaleTaskCount({
       maxCapacity: 4,
       minCapacity: 1,
     });
@@ -231,8 +241,8 @@ export class CdkStack extends cdk.Stack {
     });
 
     // アウトプットの定義
-    new cdk.CfnOutput(this, 'LoadBalancerDNS', { value: fargateService.loadBalancer.loadBalancerDnsName });
-    new cdk.CfnOutput(this, 'ServiceURL', { value: `http://${fargateService.loadBalancer.loadBalancerDnsName}` });
+    new cdk.CfnOutput(this, 'LoadBalancerDNS', { value: this.fargateService.loadBalancer.loadBalancerDnsName });
+    new cdk.CfnOutput(this, 'ServiceURL', { value: `http://${this.fargateService.loadBalancer.loadBalancerDnsName}` });
 
     // Canary用のIAMロールを作成
     const canaryRole = new iam.Role(this, 'CanaryRole', {
@@ -269,17 +279,17 @@ export class CdkStack extends cdk.Stack {
     canaryRole.addToPolicy(applicationSignalsCanaryPolicy);
 
     // CloudWatch Synthetics Canaryの作成（パブリックアクセス）
-    const canary = new synthetics.Canary(this, 'AppSignalsCanary', {
+    this.canary = new synthetics.Canary(this, 'AppSignalsCanary', {
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       test: synthetics.Test.custom({
         code: synthetics.Code.fromAsset(path.join(__dirname, "assets/canary")),
-        handler: "nodejs/node_modules/index.handler",
+        handler: "nodejs/node_modules/nodejs/node_modules/index.handler",
       }),
       memory: cdk.Size.gibibytes(1),
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_9_1,
       role: canaryRole,
       environmentVariables: {
-        URL: `http://${fargateService.loadBalancer.loadBalancerDnsName}/rolldice?rolls=12`,
+        URL: `http://${this.fargateService.loadBalancer.loadBalancerDnsName}/rolldice?rolls=12`,
         SERVICE_NAME: 'dice-server',
       },
       startAfterCreation: true,
@@ -287,6 +297,6 @@ export class CdkStack extends cdk.Stack {
     });
 
     // Application Signals統合用の設定
-    canary.node.addDependency(fargateService);
+    this.canary.node.addDependency(this.fargateService);
   }
 }
