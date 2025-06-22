@@ -7,4 +7,4 @@ node_modules
 .cdk.staging
 cdk.out
 
-!cdk/lib/assets
+!cdk/lib/assets/**/index.js
