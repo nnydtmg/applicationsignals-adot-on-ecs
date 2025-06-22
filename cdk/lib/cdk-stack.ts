@@ -232,8 +232,7 @@ export class CdkStack extends cdk.Stack {
 
     // アウトプットの定義
     new cdk.CfnOutput(this, 'LoadBalancerDNS', { value: fargateService.loadBalancer.loadBalancerDnsName });
-    const serviceUrl = `http://${fargateService.loadBalancer.loadBalancerDnsName}`;
-    new cdk.CfnOutput(this, 'ServiceURL', { value: serviceUrl });
+    new cdk.CfnOutput(this, 'ServiceURL', { value: `http://${fargateService.loadBalancer.loadBalancerDnsName}` });
 
     // Canary用のIAMロールを作成
     const canaryRole = new iam.Role(this, 'CanaryRole', {
@@ -271,13 +270,13 @@ export class CdkStack extends cdk.Stack {
     const canary = new synthetics.Canary(this, 'AppSignalsCanary', {
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       test: synthetics.Test.custom({
-        code: synthetics.Code.fromAsset(path.join(__dirname, "../../assets/canary")),
-        handler: "index.handler",
+        code: synthetics.Code.fromAsset(path.join(__dirname, "./assets/canary")),
+        handler: "nodejs/node_modules/index.handler",
       }),
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_9,
       role: canaryRole,
       environmentVariables: {
-        URL: serviceUrl,
+        URL: `http://${fargateService.loadBalancer.loadBalancerDnsName}`,
         SERVICE_NAME: 'dice-server-canary',
         OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server-canary',
         APPLICATION_SIGNALS_INTEGRATION: 'true'
