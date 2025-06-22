@@ -43,7 +43,7 @@ const ecsCluster = integ_test.assertions.awsApiCall('ECS', 'describeServices', {
 });
 
 // ステータスが"RUNNING"であることを確認
-ecsCluster.assertAtPath('services.0.status', integ.Match.anyValue());
+ecsCluster.assertAtPath('services.0.status', 'ACTIVE');
 
 // ALBがデプロイされたことを確認
 const lbDns = integ_test.assertions.awsApiCall('ElasticLoadBalancingV2', 'describeLoadBalancers', {
@@ -51,7 +51,7 @@ const lbDns = integ_test.assertions.awsApiCall('ElasticLoadBalancingV2', 'descri
 });
 
 // ALBのDNS名が存在することを確認
-lbDns.assertAtPath('loadBalancers.0.dnsName', integ.Match.anyValue());
+lbDns.assertAtPath('loadBalancers.0.dnsName', {});
 
 // Canaryがデプロイされたことを確認
 const canary = integ_test.assertions.awsApiCall('Synthetics', 'getCanary', {
@@ -59,6 +59,6 @@ const canary = integ_test.assertions.awsApiCall('Synthetics', 'getCanary', {
 });
 
 // Canaryのステータスを確認
-canary.assertAtPath('canary.status.state', integ.Match.anyValue());
+canary.assertAtPath('canary.status.state', 'RUNNING');
 
 app.synth();
