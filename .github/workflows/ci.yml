@@ -70,7 +70,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker buildx --platform linux/arm64 -t app:ci ./app
+        run: docker buildx build --platform linux/arm64 -t app:ci ./app
       - name: Verify image
         run: docker run --rm app:ci echo "Application image build successful"
 
@@ -87,6 +87,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker buildx --platform linux/arm64 -t adot:ci ./adot
+        run: docker buildx build --platform linux/arm64 -t adot:ci ./adot
       - name: Verify image
         run: docker run --rm adot:ci echo "ADOT image build successful"
