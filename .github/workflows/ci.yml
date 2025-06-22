@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  pull_request:
+    branches: '*'
   push:
     branches: [ main ]
     paths:
@@ -60,19 +62,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: cdk-synth
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+            platforms: linux/arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t app:ci ./app
-      - name: Verify image
-        run: docker run --rm app:ci echo "Application image build successful"
+        run: docker buildx build --platform linux/arm64 -t app:ci ./app
 
   build-adot-image:
     name: Build ADOT Docker Image
     runs-on: ubuntu-latest
     needs: cdk-synth
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+            platforms: linux/arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t adot:ci ./adot
-      - name: Verify image
-        run: docker run --rm adot:ci echo "ADOT image build successful"
+        run: docker buildx build --platform linux/arm64 -t adot:ci ./adot
