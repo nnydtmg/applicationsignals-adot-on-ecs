@@ -8,19 +8,23 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
+    "test:ci": "jest --ci --coverage",
     "cdk": "cdk"
   },
   "devDependencies": {
+    "@aws-cdk/integ-tests-alpha": "^2.202.0-alpha.0",
     "@types/jest": "^29.5.14",
     "@types/node": "22.7.9",
     "aws-cdk": "2.1019.1",
+    "aws-cdk-lib": "^2.202.0",
     "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "jest-snapshot": "^30.0.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "~5.6.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.201.0",
     "cdk-ecr-deployment": "^4.0.1",
     "constructs": "^10.0.0",
     "dotenv": "^16.5.0"
