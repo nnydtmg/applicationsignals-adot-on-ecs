@@ -21,6 +21,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ./cdk
+      - name: Setup Canary assets for tests
+        run: |
+          mkdir -p cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules
+          cp cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/index.js cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules/index.js
       - name: Run tests
         run: npm test
         working-directory: ./cdk
@@ -45,6 +49,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ./cdk
+      - name: Setup Canary assets for tests
+        run: |
+          mkdir -p cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules
+          cp cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/index.js cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules/index.js
       - name: Synthesize CDK app
         run: npm run cdk -- synth
         working-directory: ./cdk
@@ -62,8 +70,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ./cdk
+      - name: Install integ-test dependencies
+        run: npm install @aws-cdk/integ-tests-alpha
+        working-directory: ./cdk
       - name: Install AWS CDK
         run: npm install -g aws-cdk
+      - name: Setup Canary assets for tests
+        run: |
+          mkdir -p cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules
+          cp cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/index.js cdk/lib/assets/canary/nodejs/node_modules/nodejs/node_modules/nodejs/node_modules/index.js
       - name: Mock integration tests
         run: |
           cd cdk
