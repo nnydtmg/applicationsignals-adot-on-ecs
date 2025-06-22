@@ -267,12 +267,12 @@ export class CdkStack extends cdk.Stack {
 
     canaryRole.addToPolicy(applicationSignalsCanaryPolicy);
 
-    // CloudWatch Synthetics Canaryの作成
+    // CloudWatch Synthetics Canaryの作成（パブリックアクセス）
     const canary = new synthetics.Canary(this, 'AppSignalsCanary', {
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       test: synthetics.Test.custom({
-        code: synthetics.Code.fromAsset(path.join(__dirname, 'assets/canary')),
-        handler: 'app.handler',
+        code: synthetics.Code.fromAsset(path.join(__dirname, "../../assets/canary")),
+        handler: "index.handler",
       }),
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_9,
       role: canaryRole,
@@ -282,15 +282,6 @@ export class CdkStack extends cdk.Stack {
         OTEL_RESOURCE_ATTRIBUTES: 'service.name=dice-server-canary',
         APPLICATION_SIGNALS_INTEGRATION: 'true'
       },
-      vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-      securityGroups: [
-        new ec2.SecurityGroup(this, 'CanarySecurityGroup', {
-          vpc,
-          description: 'Security group for Synthetics Canary',
-          allowAllOutbound: true
-        })
-      ],
       startAfterCreation: true,
       artifactsBucketLocation: {
         retention: cdk.aws_s3.RetentionDays.ONE_WEEK,
