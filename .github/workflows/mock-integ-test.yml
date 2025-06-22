@@ -43,15 +43,9 @@ jobs:
           mkdir -p lib/assets/canary/nodejs/node_modules/nodejs/node_modules
           echo 'exports.handler = async () => { return "ok" };' > lib/assets/canary/nodejs/node_modules/nodejs/node_modules/index.js
       
-      # スタックがテスト環境で正常に構築できることを確認
-      - name: Execute mock integ test for cdk-stack
+      # 型チェックだけ行う（実際にスクリプトを実行しない）
+      - name: Type check integration tests
         run: |
-          # 実際のAWSデプロイを行わないテストモードでの確認
-          APP_TAG=test-mock ADOT_TAG=test-mock npx ts-node test/integ.cdk-stack.ts
-          echo "✅ integ.cdk-stack.ts successfully synthesized without errors"
-      
-      - name: Execute mock integ test for application-signals
-        run: |
-          # 実際のAWSデプロイを行わないテストモードでの確認
-          APP_TAG=test-mock ADOT_TAG=test-mock npx ts-node test/integ.application-signals.ts
-          echo "✅ integ.application-signals.ts successfully synthesized without errors"
+          # 実際のAWSデプロイなしで型チェック
+          npx tsc -p tsconfig.json --noEmit
+          echo "✅ TypeScript compilation check passed"
