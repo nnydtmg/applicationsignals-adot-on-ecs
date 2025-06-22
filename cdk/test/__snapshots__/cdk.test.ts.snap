@@ -1,0 +1,1574 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CdkStack Stack creates expected CloudFormation template 1`] = `
+{
+  "Outputs": {
+    "LoadBalancerDNS": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MyFargateServiceLBDE830E97",
+          "DNSName",
+        ],
+      },
+    },
+    "MyFargateServiceLoadBalancerDNS704F6391": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MyFargateServiceLBDE830E97",
+          "DNSName",
+        ],
+      },
+    },
+    "MyFargateServiceServiceURL4CF8398A": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "MyFargateServiceLBDE830E97",
+                "DNSName",
+              ],
+            },
+          ],
+        ],
+      },
+    },
+    "ServiceURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "MyFargateServiceLBDE830E97",
+                "DNSName",
+              ],
+            },
+          ],
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "AdotImageDeploymentCustomResourceDA13FF1B": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "DestImage": {
+          "Fn::Join": [
+            "",
+            [
+              "docker://",
+              {
+                "Fn::Select": [
+                  4,
+                  {
+                    "Fn::Split": [
+                      ":",
+                      {
+                        "Fn::GetAtt": [
+                          "AdotRepositoryBA4A4A78",
+                          "Arn",
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              ".dkr.ecr.",
+              {
+                "Fn::Select": [
+                  3,
+                  {
+                    "Fn::Split": [
+                      ":",
+                      {
+                        "Fn::GetAtt": [
+                          "AdotRepositoryBA4A4A78",
+                          "Arn",
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              ".",
+              {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              {
+                "Ref": "AdotRepositoryBA4A4A78",
+              },
+              ":test",
+            ],
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiB28EAD8E4",
+            "Arn",
+          ],
+        },
+        "SrcImage": {
+          "Fn::Join": [
+            "",
+            [
+              "docker://",
+              {
+                "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.\${AWS::Region}.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-\${AWS::Region}:93bf914ecdfc608a3227f0aa4c67a9010a21a3344876647e8c09807a05a5e032",
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "Custom::CDKECRDeployment",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AdotRepositoryBA4A4A78": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "RepositoryName": "adot-repository",
+      },
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "AppImageDeploymentCustomResource14A9AAC5": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "DestImage": {
+          "Fn::Join": [
+            "",
+            [
+              "docker://",
+              {
+                "Fn::Select": [
+                  4,
+                  {
+                    "Fn::Split": [
+                      ":",
+                      {
+                        "Fn::GetAtt": [
+                          "AppRepositoryB584A693",
+                          "Arn",
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              ".dkr.ecr.",
+              {
+                "Fn::Select": [
+                  3,
+                  {
+                    "Fn::Split": [
+                      ":",
+                      {
+                        "Fn::GetAtt": [
+                          "AppRepositoryB584A693",
+                          "Arn",
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              ".",
+              {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              {
+                "Ref": "AppRepositoryB584A693",
+              },
+              ":test",
+            ],
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiB28EAD8E4",
+            "Arn",
+          ],
+        },
+        "SrcImage": {
+          "Fn::Join": [
+            "",
+            [
+              "docker://",
+              {
+                "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.\${AWS::Region}.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-\${AWS::Region}:19502aae4fc86e0433229f0ba47bfa81b1e5d7e73ececdbce41ac6fda0ef8659",
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "Custom::CDKECRDeployment",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AppRepositoryB584A693": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "RepositoryName": "app-repository",
+      },
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "CanaryRole4BD5F96A": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/CloudWatchSyntheticsFullAccess",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonPrometheusRemoteWriteAccess",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "CanaryRoleDefaultPolicyC179670E": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "application-signals:Ingest*",
+                "cloudwatch:PutMetricData",
+                "synthetics:*",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries",
+                "s3:PutObject",
+                "s3:ListBucket",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "CanaryRoleDefaultPolicyC179670E",
+        "Roles": [
+          {
+            "Ref": "CanaryRole4BD5F96A",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiB28EAD8E4": {
+      "DependsOn": [
+        "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRoleDefaultPolicy280095F8",
+        "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRole8C8B0491",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "19459710a90e683cec4f4fafeaf7f6e839c44581dc7d5c22f39507fe7d28a583.zip",
+        },
+        "Description": "Custom resource handler for copying Docker images between docker registries.",
+        "Handler": "bootstrap",
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRole8C8B0491",
+            "Arn",
+          ],
+        },
+        "Runtime": "provided.al2023",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRole8C8B0491": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRoleDefaultPolicy280095F8": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:DescribeImages",
+                "ecr:BatchGetImage",
+                "ecr:ListTagsForResource",
+                "ecr:DescribeImageScanFindings",
+                "ecr:InitiateLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:CompleteLayerUpload",
+                "ecr:PutImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "s3:GetObject",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRoleDefaultPolicy280095F8",
+        "Roles": [
+          {
+            "Ref": "CustomCDKECRDeploymentbd07c930edb94112a20f03f096f53666512MiBServiceRole8C8B0491",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MyCluster4C1BA579": {
+      "Properties": {
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "MyFargateServiceF490C034": {
+      "DependsOn": [
+        "MyFargateServiceLBPublicListenerECSGroup4A3EDF05",
+        "MyFargateServiceLBPublicListener61A1042F",
+        "TaskRoleDefaultPolicy07FC53DE",
+        "TaskRole30FC0FBB",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "MyCluster4C1BA579",
+        },
+        "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 50,
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "app",
+            "ContainerPort": 8080,
+            "TargetGroupArn": {
+              "Ref": "MyFargateServiceLBPublicListenerECSGroup4A3EDF05",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::GetAtt": [
+                  "MyFargateServiceSecurityGroup7016792A",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": [
+              {
+                "Ref": "MyVpcprivateSubnet1Subnet3E5A1110",
+              },
+              {
+                "Ref": "MyVpcprivateSubnet2Subnet372894AA",
+              },
+            ],
+          },
+        },
+        "TaskDefinition": {
+          "Ref": "TaskDef54694570",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "MyFargateServiceLBDE830E97": {
+      "DependsOn": [
+        "MyVpcpublicSubnet1DefaultRoute1C88571A",
+        "MyVpcpublicSubnet1RouteTableAssociation6D520F26",
+        "MyVpcpublicSubnet2DefaultRoute203C8627",
+        "MyVpcpublicSubnet2RouteTableAssociation2BD1A73B",
+      ],
+      "Properties": {
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "MyFargateServiceLBSecurityGroup6FBF16F1",
+              "GroupId",
+            ],
+          },
+        ],
+        "Subnets": [
+          {
+            "Ref": "MyVpcpublicSubnet1Subnet75CA916A",
+          },
+          {
+            "Ref": "MyVpcpublicSubnet2Subnet87EBD23B",
+          },
+        ],
+        "Type": "application",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "MyFargateServiceLBPublicListener61A1042F": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "MyFargateServiceLBPublicListenerECSGroup4A3EDF05",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "MyFargateServiceLBDE830E97",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "MyFargateServiceLBPublicListenerECSGroup4A3EDF05": {
+      "Properties": {
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/healthcheck",
+        "HealthCheckPort": "8080",
+        "HealthCheckTimeoutSeconds": 15,
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 4,
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "MyFargateServiceLBSecurityGroup6FBF16F1": {
+      "Properties": {
+        "GroupDescription": "Automatically created Security Group for ELB MyTestStackMyFargateServiceLB1C43A0E9",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow from anyone on port 80",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "MyFargateServiceLBSecurityGrouptoMyTestStackMyFargateServiceSecurityGroup757F82AB80807112C8BE": {
+      "Properties": {
+        "Description": "Load balancer to target",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "MyFargateServiceSecurityGroup7016792A",
+            "GroupId",
+          ],
+        },
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "MyFargateServiceLBSecurityGroup6FBF16F1",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "MyFargateServiceSecurityGroup7016792A": {
+      "DependsOn": [
+        "TaskRoleDefaultPolicy07FC53DE",
+        "TaskRole30FC0FBB",
+      ],
+      "Properties": {
+        "GroupDescription": "MyTestStack/MyFargateService/Service/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "MyFargateServiceSecurityGroupfromMyTestStackMyFargateServiceLBSecurityGroupE6A072BD8080B3A2DE69": {
+      "DependsOn": [
+        "TaskRoleDefaultPolicy07FC53DE",
+        "TaskRole30FC0FBB",
+      ],
+      "Properties": {
+        "Description": "Load balancer to target",
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "MyFargateServiceSecurityGroup7016792A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "MyFargateServiceLBSecurityGroup6FBF16F1",
+            "GroupId",
+          ],
+        },
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "MyFargateServiceTaskCountTargetCpuScalingF003376B": {
+      "DependsOn": [
+        "TaskRoleDefaultPolicy07FC53DE",
+        "TaskRole30FC0FBB",
+      ],
+      "Properties": {
+        "PolicyName": "MyTestStackMyFargateServiceTaskCountTargetCpuScalingFD96C6CE",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": {
+          "Ref": "MyFargateServiceTaskCountTargetFD19DCA5",
+        },
+        "TargetTrackingScalingPolicyConfiguration": {
+          "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization",
+          },
+          "ScaleInCooldown": 60,
+          "ScaleOutCooldown": 60,
+          "TargetValue": 70,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "MyFargateServiceTaskCountTargetFD19DCA5": {
+      "DependsOn": [
+        "TaskRoleDefaultPolicy07FC53DE",
+        "TaskRole30FC0FBB",
+      ],
+      "Properties": {
+        "MaxCapacity": 4,
+        "MinCapacity": 1,
+        "ResourceId": {
+          "Fn::Join": [
+            "",
+            [
+              "service/",
+              {
+                "Ref": "MyCluster4C1BA579",
+              },
+              "/",
+              {
+                "Fn::GetAtt": [
+                  "MyFargateServiceF490C034",
+                  "Name",
+                ],
+              },
+            ],
+          ],
+        },
+        "RoleARN": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":iam::",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+            ],
+          ],
+        },
+        "ScalableDimension": "ecs:service:DesiredCount",
+        "ServiceNamespace": "ecs",
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+    },
+    "MyVpcF9F0CA6F": {
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "MyVpcIGW5C4A4F63": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "MyVpcVPCGW488ACE0D": {
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "MyVpcIGW5C4A4F63",
+        },
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+    "MyVpcprivateSubnet1DefaultRouteB04056EC": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "MyVpcpublicSubnet1NATGateway1839A981",
+        },
+        "RouteTableId": {
+          "Ref": "MyVpcprivateSubnet1RouteTableCBD023BE",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "MyVpcprivateSubnet1RouteTableAssociation260F1146": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "MyVpcprivateSubnet1RouteTableCBD023BE",
+        },
+        "SubnetId": {
+          "Ref": "MyVpcprivateSubnet1Subnet3E5A1110",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "MyVpcprivateSubnet1RouteTableCBD023BE": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/privateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "MyVpcprivateSubnet1Subnet3E5A1110": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.128.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/privateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "MyVpcprivateSubnet2DefaultRoute85C85F0F": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "MyVpcpublicSubnet1NATGateway1839A981",
+        },
+        "RouteTableId": {
+          "Ref": "MyVpcprivateSubnet2RouteTableB9EC50DF",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "MyVpcprivateSubnet2RouteTableAssociationBC4A677C": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "MyVpcprivateSubnet2RouteTableB9EC50DF",
+        },
+        "SubnetId": {
+          "Ref": "MyVpcprivateSubnet2Subnet372894AA",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "MyVpcprivateSubnet2RouteTableB9EC50DF": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/privateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "MyVpcprivateSubnet2Subnet372894AA": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.192.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/privateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "MyVpcpublicSubnet1DefaultRoute1C88571A": {
+      "DependsOn": [
+        "MyVpcVPCGW488ACE0D",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "MyVpcIGW5C4A4F63",
+        },
+        "RouteTableId": {
+          "Ref": "MyVpcpublicSubnet1RouteTable2E0CCC3A",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "MyVpcpublicSubnet1EIPA11A8EA3": {
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "MyVpcpublicSubnet1NATGateway1839A981": {
+      "DependsOn": [
+        "MyVpcpublicSubnet1DefaultRoute1C88571A",
+        "MyVpcpublicSubnet1RouteTableAssociation6D520F26",
+      ],
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "MyVpcpublicSubnet1EIPA11A8EA3",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": {
+          "Ref": "MyVpcpublicSubnet1Subnet75CA916A",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "MyVpcpublicSubnet1RouteTable2E0CCC3A": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "MyVpcpublicSubnet1RouteTableAssociation6D520F26": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "MyVpcpublicSubnet1RouteTable2E0CCC3A",
+        },
+        "SubnetId": {
+          "Ref": "MyVpcpublicSubnet1Subnet75CA916A",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "MyVpcpublicSubnet1Subnet75CA916A": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.0.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "MyVpcpublicSubnet2DefaultRoute203C8627": {
+      "DependsOn": [
+        "MyVpcVPCGW488ACE0D",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "MyVpcIGW5C4A4F63",
+        },
+        "RouteTableId": {
+          "Ref": "MyVpcpublicSubnet2RouteTable18FD0DBF",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "MyVpcpublicSubnet2RouteTable18FD0DBF": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "MyVpcpublicSubnet2RouteTableAssociation2BD1A73B": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "MyVpcpublicSubnet2RouteTable18FD0DBF",
+        },
+        "SubnetId": {
+          "Ref": "MyVpcpublicSubnet2Subnet87EBD23B",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "MyVpcpublicSubnet2Subnet87EBD23B": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.64.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "MyTestStack/MyVpc/publicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "MyVpcF9F0CA6F",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "ServiceLogGroup63E10E16": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "TaskDef54694570": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "DependsOn": [
+              {
+                "Condition": "START",
+                "ContainerName": "cw-agent",
+              },
+              {
+                "Condition": "START",
+                "ContainerName": "adot",
+              },
+            ],
+            "Environment": [
+              {
+                "Name": "OTEL_TRACES_EXPORTER",
+                "Value": "otlp",
+              },
+              {
+                "Name": "OTEL_LOGS_EXPORTER",
+                "Value": "otlp",
+              },
+              {
+                "Name": "OTEL_METRICS_EXPORTER",
+                "Value": "otlp",
+              },
+              {
+                "Name": "OTEL_PROPAGATORS",
+                "Value": "xray,tracecontext,baggage,b3",
+              },
+              {
+                "Name": "OTEL_RESOURCE_ATTRIBUTES",
+                "Value": "service.name=dice-server,aws.log.group.names=dice-server",
+              },
+              {
+                "Name": "OTEL_EXPORTER_OTLP_PROTOCOL",
+                "Value": "http/protobuf",
+              },
+              {
+                "Name": "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+                "Value": "http://127.0.0.1:4316/v1/traces",
+              },
+              {
+                "Name": "OTEL_AWS_APPLICATION_SIGNALS_EXPORTER_ENDPOINT",
+                "Value": "http://127.0.0.1:4316/v1/metrics",
+              },
+              {
+                "Name": "OTEL_AWS_APPLICATION_SIGNALS_ENABLED",
+                "Value": "true",
+              },
+              {
+                "Name": "OTEL_TRACES_SAMPLER",
+                "Value": "always_on",
+              },
+              {
+                "Name": "JAVA_TOOL_OPTIONS",
+                "Value": "-javaagent:/app/aws-opentelemetry-agent.jar",
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Select": [
+                      4,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::GetAtt": [
+                              "AppRepositoryB584A693",
+                              "Arn",
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".dkr.ecr.",
+                  {
+                    "Fn::Select": [
+                      3,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::GetAtt": [
+                              "AppRepositoryB584A693",
+                              "Arn",
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/",
+                  {
+                    "Ref": "AppRepositoryB584A693",
+                  },
+                  ":test",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "ServiceLogGroup63E10E16",
+                },
+                "awslogs-region": {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "ecs-app",
+              },
+            },
+            "Name": "app",
+            "PortMappings": [
+              {
+                "ContainerPort": 8080,
+                "HostPort": 8080,
+                "Protocol": "tcp",
+              },
+            ],
+          },
+          {
+            "Essential": true,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Select": [
+                      4,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::GetAtt": [
+                              "AdotRepositoryBA4A4A78",
+                              "Arn",
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".dkr.ecr.",
+                  {
+                    "Fn::Select": [
+                      3,
+                      {
+                        "Fn::Split": [
+                          ":",
+                          {
+                            "Fn::GetAtt": [
+                              "AdotRepositoryBA4A4A78",
+                              "Arn",
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/",
+                  {
+                    "Ref": "AdotRepositoryBA4A4A78",
+                  },
+                  ":test",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "ServiceLogGroup63E10E16",
+                },
+                "awslogs-region": {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "ecs-adot",
+              },
+            },
+            "Name": "adot",
+          },
+          {
+            "Environment": [
+              {
+                "Name": "CW_CONFIG_CONTENT",
+                "Value": "{"traces":{"traces_collected":{"application_signals":{"enabled":true}}},"logs":{"metrics_collected":{"application_signals":{"enabled":true}}}}",
+              },
+              {
+                "Name": "OTEL_RESOURCE_ATTRIBUTES",
+                "Value": "service.name=dice-server",
+              },
+            ],
+            "Essential": true,
+            "Image": "public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest-arm64",
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "ServiceLogGroup63E10E16",
+                },
+                "awslogs-region": {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "ecs-cw-agent",
+              },
+            },
+            "Name": "cw-agent",
+          },
+        ],
+        "Cpu": "1024",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "TaskExecutionRole250D2532",
+            "Arn",
+          ],
+        },
+        "Family": "MyTestStackTaskDef3775C888",
+        "Memory": "2048",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "RuntimePlatform": {
+          "CpuArchitecture": "ARM64",
+          "OperatingSystemFamily": "LINUX",
+        },
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "TaskRole30FC0FBB",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "TaskExecutionRole250D2532": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/CloudWatchAgentServerPolicy",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonPrometheusRemoteWriteAccess",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AWSXrayWriteOnlyAccess",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TaskExecutionRoleDefaultPolicyA84DD1B0": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "application-signals:Ingest*",
+                "cloudwatch:PutMetricData",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "ServiceLogGroup63E10E16",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TaskExecutionRoleDefaultPolicyA84DD1B0",
+        "Roles": [
+          {
+            "Ref": "TaskExecutionRole250D2532",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TaskRole30FC0FBB": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/CloudWatchAgentServerPolicy",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AWSXrayWriteOnlyAccess",
+              ],
+            ],
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonPrometheusRemoteWriteAccess",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TaskRoleDefaultPolicy07FC53DE": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "application-signals:Ingest*",
+                "cloudwatch:PutMetricData",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TaskRoleDefaultPolicy07FC53DE",
+        "Roles": [
+          {
+            "Ref": "TaskRole30FC0FBB",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
